@@ -1,6 +1,8 @@
 # CrypkoGraph (α) http://crypko.untan.xyz/
 Generate your crypko tree graph on crypko.ai
 
+![yuntan_t's crypkos](example.png)
+
 ## REQUIREMENTS
 ```bash
 pip install bottle graphviz
