@@ -29,8 +29,10 @@ def get_crypko_ids_by_owner(owner_addr: str, page_limit: int=3) -> List[int]:
     res = r.json()
     # crypkos[].id
     crypko_ids = [c['id'] for c in res['crypkos']]
+    if len(crypko_ids) == 0:  # avoid ZeroDivisionError
+        return []
 
-    max_page = res['totalMatched'] // len(res['crypkos'])
+    max_page = res['totalMatched'] // len(crypko_ids)
     if page_limit:
         max_page = min(max_page, page_limit)
     for i in range(1, max_page + 1):
