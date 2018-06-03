@@ -9,4 +9,4 @@ def render():
     owner_addr = request.query['owner_addr']
     if not owner_addr:
         raise Exception()
-    # render_graph(owner_addr)
+    render_graph(owner_addr)
