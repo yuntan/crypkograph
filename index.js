@@ -11,22 +11,23 @@ function submit() {
 
   fetch(URL_SEARCH + `?category=all&sort=-id&ownerAddr=${ownerAddr}`).then((res) => {
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-
-    let numOfCrypkos = parseInt(res.text());
+    return res.json();
+  }).then((obj) => {
+    let numOfCrypkos = obj['totalMatched'];
     if (numOfCrypkos > WARN_NUM) {
       statusDiv.innerText +=
         `\nYour crypko collection is larger than ${WARN_NUM}. Only first ${WARN_NUM} crypkos will be shown.`;
     }
 
-    fetch(`/api/render?owner_addr=${ownerAddr}`).then((res) => {
+    return fetch(`/api/render?owner_addr=${ownerAddr}`)
+  }).then((res) => {
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
       statusDiv.innerHTML = `
         <img src="/${ownerAddr}.gv.png" style="width: 100%"/>
         <a href="/${ownerAddr}.gv.pdf">Download PDF</a>
       `;
-    }).catch((err) => {
-      statusDiv.innerText = `Error! ${err.message}`;
-    });
+  }).catch((err) => {
+    statusDiv.innerText = `Error! ${err.message}`;
   });
 }
