@@ -6,16 +6,9 @@ from typing import Any, List, NamedTuple
 import requests
 from graphviz import Digraph
 
-URL_SEARCH = 'https://api.crypko.ai/crypkos/search' \
-    '?category=all&sort=-id&ownerAddr={owner_addr}'
-# crypkos[].id
+URL_SEARCH = 'https://api.crypko.ai/crypkos/search'
 URL_DETAIL = 'https://api.crypko.ai/crypkos/{crypko_id}/detail'
-# ownerAddr
-# derivatives[].id
-# TODO originsはどうやって求める？
 URL_IMG = 'https://img.crypko.ai/daisy/{crypko_img_name}'
-# crypko_img_id = sha1(noise + "asdasd3edwasd" + attr)
-IMG_SIZE = 96
 
 
 class Crypko(NamedTuple):
@@ -29,14 +22,34 @@ class Crypko(NamedTuple):
     owner_name: str
 
 
-def get_crypko_ids_by_owner(owner_addr: str) -> List[int]:
-    res = requests.get(URL_SEARCH.format(owner_addr=owner_addr)).json()
-    return [c['id'] for c in res['crypkos']]
+def get_crypko_ids_by_owner(owner_addr: str, page_limit: int=3) -> List[int]:
+    params = dict(category='all', sort='-id', ownerAddr=owner_addr)
+    r = requests.get(URL_SEARCH, params)
+    r.raise_for_status()
+    res = r.json()
+    # crypkos[].id
+    crypko_ids = [c['id'] for c in res['crypkos']]
+
+    max_page = res['totalMatched'] // len(res['crypkos'])
+    if page_limit:
+        max_page = min(max_page, page_limit)
+    for i in range(1, max_page + 1):
+        params['page'] = str(i)
+        r = requests.get(URL_SEARCH, params)
+        r.raise_for_status()
+        res = r.json()
+        crypko_ids = crypko_ids + [c['id'] for c in res['crypkos']]
+
+    return crypko_ids
 
 
 def get_crypko_by_id(crypko_id: int) -> Crypko:
-    res = requests.get(URL_DETAIL.format(crypko_id=crypko_id)).json()
+    r = requests.get(URL_DETAIL.format(crypko_id=crypko_id))
+    r.raise_for_status()
+    res = r.json()
+    # derivatives[].id
     derivatives = [c['id'] for c in res['derivatives']]
+    # TODO originsはどうやって求める？
     noise = res['noise']
     attrs = res['attrs']
     img_id = get_crypko_img_id(noise, attrs)
@@ -53,6 +66,7 @@ def get_crypko_by_id(crypko_id: int) -> Crypko:
 
 
 def get_crypko_img_id(noise: str, attrs: str) -> str:
+    # crypko_img_id = sha1(noise + "asdasd3edwasd" + attr)
     return sha1((noise + 'asdasd3edwasd' + attrs).encode()).hexdigest()
 
 
@@ -64,17 +78,16 @@ def get_crypko_img_url(c: Crypko) -> str:
     return URL_IMG.format(crypko_img_name=get_crypko_img_name(c))
 
 
-def download(url, filename) -> bool:
+def download(url, filename):
     r = requests.get(url, stream=True)
-    if r.status_code != 200:
-        return False
+    r.raise_for_status()
     with open(filename, 'wb') as f:
         r.raw.decode_content = True
         shutil.copyfileobj(r.raw, f)
-    return True
+    return
 
 
-def flatten(l: List[Any]):
+def flatten(l: List[List[Any]]) -> List[Any]:
     return list(chain.from_iterable(l))
 
 
