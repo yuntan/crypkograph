@@ -1,7 +1,7 @@
 from itertools import chain
 from hashlib import sha1
 import shutil
-from typing import Any, List, NamedTuple
+from typing import Any, List, NamedTuple, Iterable
 
 import requests
 from graphviz import Digraph
@@ -9,10 +9,14 @@ from graphviz import Digraph
 URL_SEARCH = 'https://api.crypko.ai/crypkos/search'
 URL_DETAIL = 'https://api.crypko.ai/crypkos/{crypko_id}/detail'
 URL_IMG = 'https://img.crypko.ai/daisy/{crypko_img_name}'
+URL_CARD = 'https://crypko.ai/#/card/{crypko_id}'
 
 
 class Crypko(NamedTuple):
     id: int
+    name: str
+    matron: int
+    sire: int
     derivatives: List[int]
     iteration: int
     noise: str
@@ -20,6 +24,7 @@ class Crypko(NamedTuple):
     img_id: str
     owner_addr: str
     owner_name: str
+    card_url: str
 
 
 def get_crypko_ids_by_owner(owner_addr: str, page_limit: int=3) -> List[int]:
@@ -49,21 +54,28 @@ def get_crypko_by_id(crypko_id: int) -> Crypko:
     r = requests.get(URL_DETAIL.format(crypko_id=crypko_id))
     r.raise_for_status()
     res = r.json()
+    matron = res['matron']['id']
+    sire = res['sire']['id']
     # derivatives[].id
     derivatives = [c['id'] for c in res['derivatives']]
     # TODO originsはどうやって求める？
     noise = res['noise']
     attrs = res['attrs']
     img_id = get_crypko_img_id(noise, attrs)
+    card_url = URL_CARD.format(crypko_id=crypko_id)
     return Crypko(
         crypko_id,
+        res.get('name'),  # name is optional
+        matron,
+        sire,
         derivatives,
         res['iteration'],
         noise,
         attrs,
         img_id,
         res['owner']['address'],
-        res['owner']['username']
+        res['owner']['username'],
+        card_url
     )
 
 
@@ -89,17 +101,18 @@ def download(url, filename):
     return
 
 
-def flatten(l: List[List[Any]]) -> List[Any]:
-    return list(chain.from_iterable(l))
+def flatten(l: Iterable[Iterable[Any]]) -> Iterable[Any]:
+    return chain.from_iterable(l)
 
 
-def render_graph(owner_addr: str):
+def render_graph(owner_addr: str, subdir=None):
     crypkos_of_owner = [get_crypko_by_id(id)
                         for id in get_crypko_ids_by_owner(owner_addr)]
     crypko_id_set_of_owner = {c.id for c in crypkos_of_owner}
     crypko_id_set_of_others = {
         id
-        for id in flatten([c.derivatives for c in crypkos_of_owner])
+        for id in flatten([[c.matron, c.sire] + c.derivatives
+                           for c in crypkos_of_owner])
         if id not in crypko_id_set_of_owner
     }
     crypkos_of_others = [get_crypko_by_id(id)
@@ -112,22 +125,35 @@ def render_graph(owner_addr: str):
         img_name = get_crypko_img_name(c)
         download(get_crypko_img_url(c), img_name)
         # NOTE node id must be str
-        dot.node(str(c.id), f"""<
-        <table>
+        node_id = str(c.id)
+        color = '#D36061' if c.owner_addr == owner_addr else 'black'
+        # NOTE hrefはPDFでは無効
+        dot.node(node_id, f"""<
+        <table border="1" cellborder="0" cellspacing="0">
             <tr>
                 <td><img src="{img_name}"/></td>
             </tr>
             <tr>
-                <td>{c.owner_name}'s iter {c.iteration}</td>
+                <td>
+                    {c.name if c.name else '#' + str(c.id)}<br/>
+                    Iter <b>{c.iteration}</b> / {c.owner_name}
+                </td>
             </tr>
         </table>
-            >""", shape='none')
+            >""", shape='none', color=color, href=c.card_url)
 
+    # 自分の所有するカードからその派生への全ての辺
     for c in crypkos_of_owner:
         for id in c.derivatives:
             dot.edge(str(c.id), str(id))
+    # 自分の所有しないカードから派生している自分の所有するカードへの辺
+    for c in crypkos_of_others:
+        for id in c.derivatives:
+            if id in crypkos_of_owner:
+                dot.edge(str(c.id), str(id))
 
+    filename = f'{owner_addr}.gv'
     dot.format = 'png'
-    dot.render(f'{owner_addr}.gv')
+    dot.render(filename, subdir)
     dot.format = 'pdf'
-    dot.render(f'{owner_addr}.gv')
+    dot.render(filename, subdir)
