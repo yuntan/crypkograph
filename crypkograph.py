@@ -1,3 +1,4 @@
+from os import path
 from itertools import chain
 from hashlib import sha1
 import shutil
@@ -5,6 +6,8 @@ from typing import Any, List, NamedTuple, Iterable
 
 import requests
 from graphviz import Digraph
+
+from settings import DIR_CACHE
 
 URL_SEARCH = 'https://api.crypko.ai/crypkos/search'
 URL_DETAIL = 'https://api.crypko.ai/crypkos/{crypko_id}/detail'
@@ -92,7 +95,7 @@ def get_crypko_img_url(c: Crypko) -> str:
     return URL_IMG.format(crypko_img_name=get_crypko_img_name(c))
 
 
-def download(url, filename):
+def download(url: str, filename: str):
     r = requests.get(url, stream=True)
     r.raise_for_status()
     with open(filename, 'wb') as f:
@@ -123,7 +126,7 @@ def render_graph(owner_addr: str, subdir=None):
 
     for c in crypkos:
         img_name = get_crypko_img_name(c)
-        download(get_crypko_img_url(c), img_name)
+        download(get_crypko_img_url(c), path.join(DIR_CACHE, img_name))
         # NOTE node id must be str
         node_id = str(c.id)
         color = '#D36061' if c.owner_addr == owner_addr else 'black'
@@ -131,7 +134,7 @@ def render_graph(owner_addr: str, subdir=None):
         dot.node(node_id, f"""<
         <table border="1" cellborder="0" cellspacing="0">
             <tr>
-                <td><img src="{img_name}"/></td>
+                <td><img src="{DIR_CACHE}/{img_name}"/></td>
             </tr>
             <tr>
                 <td>
