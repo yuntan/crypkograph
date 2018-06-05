@@ -126,22 +126,24 @@ def render_graph(owner_addr: str, subdir=None):
     dot = Digraph(comment=f'Crypkos of {owner_addr}')
 
     for c in crypkos:
+        mine = c.owner_addr == owner_addr
         img_name = get_crypko_img_name(c)
         download(get_crypko_img_url(c), path.join(DIR_CACHE, img_name))
         # NOTE node id must be str
         node_id = str(c.id)
-        color = '#D36061' if c.owner_addr == owner_addr else 'black'
+        border = 3 if mine else 1
+        color = '#D36061' if mine else 'black'
         # NOTE hrefはPDFでは無効
         dot.node(node_id, f"""<
-        <table border="1" cellborder="0" cellspacing="0">
+        <table border="{border}" cellborder="0" cellspacing="0">
             <tr>
                 <td><img src="{DIR_CACHE}/{img_name}"/></td>
             </tr>
             <tr>
-                <td>
-                    {c.name if c.name else '#' + str(c.id)}<br/>
-                    Iter <b>{c.iteration}</b> / {c.owner_name}
-                </td>
+                <td>{c.name if c.name else '#' + str(c.id)}<br/></td>
+            </tr>
+            <tr>
+                <td>Iter <b>{c.iteration}</b> / {c.owner_name}</td>
             </tr>
         </table>
             >""", shape='none', color=color, href=c.card_url)
