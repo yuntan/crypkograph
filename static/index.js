@@ -24,8 +24,8 @@ function submit() {
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
 
       statusDiv.innerHTML = `
-        <img src="/${ownerAddr}.gv.png" style="width: 100%"/>
-        <a href="/${ownerAddr}.gv.pdf">Download PDF</a>
+        <img src="/generated/${ownerAddr}.gv.png" style="width: 100%"/>
+        <a href="/generated/${ownerAddr}.gv.pdf">Download PDF</a>
       `;
   }).catch((err) => {
     statusDiv.innerText = `Error! ${err.message}`;
