@@ -150,11 +150,11 @@ def render_graph(owner_addr: str, subdir=None):
     for c in crypkos_of_owner:
         for id in c.derivatives:
             dot.edge(str(c.id), str(id))
-    # 自分の所有しないカードから派生している自分の所有するカードへの辺
-    for c in crypkos_of_others:
-        for id in c.derivatives:
-            if id in crypkos_of_owner:
-                dot.edge(str(c.id), str(id))
+    # 自分の所有するカードの親が自分の所有していないカードであるときの辺
+    for c in crypkos_of_owner:
+        for id in [c.matron, c.sire]:
+            if id in crypko_id_set_of_others:
+                dot.edge(str(id), str(c.id))
 
     filename = f'{owner_addr}.gv'
     dot.format = 'png'
