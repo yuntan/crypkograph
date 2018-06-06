@@ -58,11 +58,12 @@ def get_crypko_by_id(crypko_id: int) -> Crypko:
     r = requests.get(URL_DETAIL.format(crypko_id=crypko_id))
     r.raise_for_status()
     res = r.json()
-    matron = res['matron']['id']
-    sire = res['sire']['id']
-    # derivatives[].id
-    derivatives = [c['id'] for c in res['derivatives']]
-    # TODO originsはどうやって求める？
+    # NOTE Iter 0のカードはmatronとsireがない
+    matron = res.get('matron')
+    matron_id = matron['id'] if matron else None
+    sire = res.get('sire')
+    sire_id = sire['id'] if sire else None
+    derivative_ids = [c['id'] for c in res['derivatives']]
     noise = res['noise']
     attrs = res['attrs']
     img_id = get_crypko_img_id(noise, attrs)
@@ -70,9 +71,9 @@ def get_crypko_by_id(crypko_id: int) -> Crypko:
     return Crypko(
         crypko_id,
         res.get('name'),  # name is optional
-        matron,
-        sire,
-        derivatives,
+        matron_id,
+        sire_id,
+        derivative_ids,
         res['iteration'],
         noise,
         attrs,
@@ -117,6 +118,7 @@ def render_graph(owner_addr: str, subdir=None):
         id
         for id in flatten([[c.matron, c.sire] + c.derivatives
                            for c in crypkos_of_owner])
+        if id  # None check
         if id not in crypko_id_set_of_owner
     }
     crypkos_of_others = [get_crypko_by_id(id)
