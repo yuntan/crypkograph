@@ -7,18 +7,41 @@
   <body>
     <h1>CrypkoGraph (α)</h1>
     <p>
-      Generate your Crypko tree graph on <a href="https://crypko.ai">crypko.ai</a>.
+      Generate your Crypko tree graph on <a href="https://crypko.ai" target="_blank">crypko.ai</a>.
     </p>
-    <p>
-      Source code: <a href="https://github.com/yuntan/crypkograph">GitHub</a>
-    </p>
-    <img src="/static/example.png" alt="Example. yuntan_t's Crypko graph."/>
+    <a href="https://gyazo.com/d91e1f5ac2253540e4b6ff10a2189db0"><img src="https://i.gyazo.com/735b762a33c041dff50a865fb44e836f.png" alt="Example. yuntan_t's crypkos." height="256"/></a>
+
     <h2>Updates</h2>
     <ul>
       <li>2018-06-03 20:00 (JST) First release</li>
-      <li>2018-06-04 01:00 (JST) 12枚しかcrypkoカード取得できなかったのを36枚まで取得できるように修正．</li>
+      <li>2018-06-04 01:00 (JST) 12枚しかcrypkoカードを取得できなかったのを36枚まで取得できるように修正．</li>
+      <li>
+        2018-06-06 01:00 (JST)
+        <ul>
+          <li>自分が所有する全てのカードの親をグラフに含めるように修正</li>
+          <li>13枚目以降のカードの取得ができていなかった不具合を修正</li>
+          <li>カードにつけた名前かIDを表示するように修正</li>
+          <li>自分の所有するカードの枠を赤くするように変更</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h2>About</h2>
+    <ul>
+      <li><a href="https://github.com/yuntan/crypkograph" target="_blank">Source code on GitHub</a></li>
+      <li>This website uses <a href="https://bottlepy.org/docs/dev/" target="_blank">Bottle</a> framework.</li>
+      <li>This website uses <a href="http://www.graphviz.org/" target="_blank">Graphviz</a> for graph visualization.</li>
+      <li>
+        Author: yuntan_t
+        <ul>
+          <li>mastodon: <a href="https://mstdn.maud.io/@yuntan_t" target="_blank">@yuntan_t@mstdn.maud.io</a></li>
+          <li>Twitter:: <a href="https://twitter.com/@yuntan_t" target="_blank">@yuntan_t</a></li>
+          <li><strong>Donate crypko to 0xc4765a8cf0f2ab524ecfece14069bb7e3f5e8ec9</strong></li>
+        </ul>
+      </li>
     </ul>
     <hr/>
+
     Please enter your address (ex: 0xc4765a8cf0f2ab524ecfece14069bb7e3f5e8ec9)<br/>
     <input type="text"/><button onclick="submit()">Submit</button>
     <div class="status"></div>
