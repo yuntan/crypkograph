@@ -5,7 +5,7 @@ Generate your crypko tree graph on crypko.ai
 
 ## REQUIREMENTS
 ```bash
-pip install bottle graphviz
+pip install bottle graphviz python-dotenv requests
 apt install graphviz # Ubuntu/Debian
 ```
 
