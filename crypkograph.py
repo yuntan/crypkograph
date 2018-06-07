@@ -99,6 +99,8 @@ def get_crypko_img_url(c: Crypko) -> str:
 
 def download(url: str, filename: str):
     r = requests.get(url, stream=True)
+    if (r.status_code == 403):
+        r = requests.get('https://crypko.ai/static/images/generating.jpg', stream=True)
     r.raise_for_status()
     with open(filename, 'wb') as f:
         r.raw.decode_content = True
