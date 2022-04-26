@@ -1,0 +1,4 @@
+bottle
+graphviz
+python-dotenv
+requests
