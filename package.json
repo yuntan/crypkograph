@@ -1,19 +1,29 @@
 {
   "name": "crypkograph",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "author": "Yuto Tokunaga <yuntan@untan.xyz>",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yuntan/crypkograph.git"
   },
-  "author": "Yuto Tokunaga <yuntan@untan.xyz>",
-  "license": "MIT",
+  "homepage": "https://github.com/yuntan/crypkograph#readme",
   "bugs": {
     "url": "https://github.com/yuntan/crypkograph/issues"
   },
-  "homepage": "https://github.com/yuntan/crypkograph#readme"
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack",
+    "test": "mocha"
+  },
+  "dependencies": {
+    "copy-webpack-plugin": "^10.2.4",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2",
+    "zip-webpack-plugin": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.183"
+  }
 }
