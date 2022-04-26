@@ -1,0 +1,14 @@
+{
+  "appName": {
+    "message": "CrypkoGraph",
+    "description": "The title of the application, displayed in the web store."
+  },
+  "appShortName": {
+    "message": "CrypkoGraph",
+    "description": "The short name of the application."
+  },
+  "appDesc": {
+    "message": "Generate your crypko tree graph on crypko.ai",
+    "description":"The description of the application, displayed in the web store."
+  }
+}

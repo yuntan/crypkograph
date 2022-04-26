@@ -1,0 +1,11 @@
+{
+  "appName": {
+    "message": "CrypkoGraph"
+  },
+  "appShortName": {
+    "message": "CrypkoGraph"
+  },
+  "appDesc": {
+    "message": "自分が所有しているcrypkoの生成・融合履歴をツリーグラフでダウンロードできる拡張機能"
+  }
+}
