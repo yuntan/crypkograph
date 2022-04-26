@@ -1,9 +1,15 @@
-from os import mkdir
+import os
+import regex
 
 from bottle import route, get, request, static_file, run
 
-from settings import PORT, DIR_CACHE, DIR_GRAPH
+from google import storage
+
 from crypkograph import render_graph
+
+
+PORT = int(os.environ['PORT'])
+GCS_BUCKET = os.environ['GCS_BUCKET']
 
 
 @route('/')
@@ -26,19 +32,14 @@ def serve_generated(filename):
         return static_file(filename, DIR_GRAPH, download=filename)
 
 
-# /api/render?owner_addr={owner_addr}
+# /api/render?user_id={user_id}
 @get('/api/render')
 def render():
-    owner_addr = request.query['owner_addr']
-    if not owner_addr:
-        raise Exception()
-    render_graph(owner_addr, subdir=DIR_GRAPH)
+    user_id: str = request.query['user_id']
+    if not user_id or not regex.match(r'^\d{19}$', user_id):
+        raise Exception()  # TODO: return invalid request
+    crypko_graph = render_graph(user_id)
 
 
 if __name__ == '__main__':
-    try:
-        mkdir(DIR_CACHE)
-    except FileExistsError:
-        pass
-
     run(host='0.0.0.0', port=PORT)

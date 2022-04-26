@@ -9,6 +9,7 @@ from graphviz import Digraph
 
 from settings import DIR_CACHE
 
+USER_URL
 URL_SEARCH = 'https://api.crypko.ai/crypkos/search'
 URL_DETAIL = 'https://api.crypko.ai/crypkos/{crypko_id}/detail'
 URL_IMG = 'https://img.crypko.ai/daisy/{crypko_img_name}'
