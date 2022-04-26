@@ -1,0 +1,19 @@
+{
+  "name": "crypkograph",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuntan/crypkograph.git"
+  },
+  "author": "Yuto Tokunaga <yuntan@untan.xyz>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yuntan/crypkograph/issues"
+  },
+  "homepage": "https://github.com/yuntan/crypkograph#readme"
+}
