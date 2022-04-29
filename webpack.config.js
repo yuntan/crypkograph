@@ -4,16 +4,21 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ZipWebpackPlugin = require('zip-webpack-plugin');
 
 module.exports = {
-  mode: 'production',
-  entry: path.resolve(__dirname, 'src/background.js'),
+  mode: 'development',
+  devtool: 'source-map',
+  entry: {
+    background: path.resolve(__dirname, 'src/background.js'),
+    index: path.resolve(__dirname, 'src/index.js'),
+  },
   output: {
-    filename: 'background.js',
+    filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
   },
   plugins: [
     new CopyWebpackPlugin({
       patterns: [
         'manifest.json',
+        'index.html',
         '_locales/**',
         'icons/*.png',
       ],

@@ -8,9 +8,13 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": [],
+  "permissions": [
+    "webRequest"
+  ],
   "host_permissions": [
-    "https://crypko.ai/"
+    "https://crypko.ai/",
+    "https://api.crypko.ai/",
+    "https://crypko.oss-ap-northeast-1.aliyuncs.com/"
   ],
   "action": {
     "default_icon": {
@@ -18,7 +22,8 @@
       "32": "icons/32x32.png",
       "48": "icons/48x48.png",
       "128": "icons/128x128.png"
-    }
+    },
+    "defaultTitle": "CrypkoGraph"
   },
   "icons": {
     "16": "icons/16x16.png",

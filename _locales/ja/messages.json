@@ -6,6 +6,6 @@
     "message": "CrypkoGraph"
   },
   "appDesc": {
-    "message": "自分が所有しているcrypkoの生成・融合履歴をツリーグラフでダウンロードできる拡張機能"
+    "message": "Crypkoの生成・融合履歴を樹形図で閲覧できる拡張機能"
   }
 }

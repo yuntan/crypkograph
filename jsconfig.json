@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "noImplicitAny": true,
+    "target": "es2021",
+    "lib": ["ES2021", "DOM"],
+    "moduleResolution": "node"
+  }
+}
