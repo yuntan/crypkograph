@@ -4,9 +4,8 @@
  *   name: string;
  *   ownerID: string;
  *   model: string;
- *   public: boolean;
  *   faved: boolean;
- *   parents: [string, string];
+ *   parents: string[];
  *   children: string[];
  * }} Crypko
  *
@@ -15,4 +14,26 @@
  *   crypkoThumbnailURLs: { [crypkoID: string]: string };
  *   crypkos: Crypko[];
  * }} State
+ *
+ * @typedef {{
+ *   count: number;
+ *   results: CrypkosResponseJSONResult[];
+ * }} CrypkosResponseJSON
+ *
+ * @typedef {{
+ *   hash: string;
+ * }} CrypkosResponseJSONResult
+ *
+ * @typedef {{
+ *   name: string;
+ *   owner: { id: string; };
+ *   model: string;
+ *   faved: boolean;
+ *   parents: CrypkoResponseJSONParentOrChild[];
+ *   children: CrypkoResponseJSONParentOrChild[];
+ * }} CrypkoResponseJSON
+ *
+ * @typedef {{
+ *   hash: string;
+ * }} CrypkoResponseJSONParentOrChild
  */

@@ -68,7 +68,7 @@ export async function onClicked(tab) {
   for (let i = 1; i <= Math.ceil(crypkos.length / 20); i++) {
     const url = `https://crypko.ai/user/${userID}/crypko?page=${i}`
     const tab = await chrome.tabs.create({ url });
-    await sleep(5);
+    await sleep(15);
     await chrome.tabs.remove(tab.id);
   }
 
@@ -82,53 +82,70 @@ export async function onClicked(tab) {
  * @returns {Promise<Crypko[]>}
  */
 async function fetchAllCrypkos(userID) {
-  let url = `https://api.crypko.ai/crypkos/?owner=${userID}&ordering=-created&page=1`;
-  let count = 0;
-  /** @type {Crypko[]} */
-  let crypkos = [];
+  let baseURL = `https://api.crypko.ai/crypkos/?owner=${userID}&ordering=-created`;
+  const res = await fetch(`${baseURL}&page=1`, {
+    headers: { 'Authorization': `Bearer ${store.state.token}` },
+  });
+  if (!res.ok) {
+    console.error(`failed to fetch Crypkos. status: ${res.status}, body: ${await res.text()}`);
+    return;
+  }
 
-  while (true) {
-    const res = await fetch(url, {
+  /** @type {CrypkosResponseJSON} */
+  const resJSON = await res.json();
+  const { count } = resJSON;
+
+  let hashs = resJSON.results.map((result) => result.hash);
+  
+  for (let i = 2; i <= Math.ceil(count / 20); i++) {
+    let res = await fetch(`${baseURL}&page=${i}`, {
+      headers: { 'Authorization': `Bearer ${store.state.token}` },
+    });
+
+    if (!res.ok) {
+      console.error(`failed to fetch Crypkos (page ${i}). status: ${res.status}, body: ${await res.text()}`);
+      return;
+    }
+
+    /** @type {CrypkosResponseJSON} */
+    const resJSON = await res.json();
+    hashs = hashs.concat(
+      resJSON.results.map((result) => result.hash)
+    );
+
+    await sleep(.1);
+  }
+
+  /** @type Crypko[] */
+  const crypkos = [];
+
+  for (let hash of hashs) {
+    const res = await fetch(`https://api.crypko.ai/crypkos/${hash}/`, {
       headers: { 'Authorization': `Bearer ${store.state.token}` },
     });
     if (!res.ok) {
-      console.error(`failed to fetch crypko count. status: ${res.status}, body: ${await res.text()}`);
-      break;
+      console.error(`failed to fetch Crypko (${hash}) info. status: ${res.status}, body: ${await res.text()}`);
+      continue;
     }
-    /** @type {any} */
-    const resJSON = await res.json()
-    count = resJSON.count;
 
-    for (let result of resJSON.results) {
-      const { hash } = result;
-      const res = await fetch(`https://api.crypko.ai/crypkos/${hash}`, {
-        headers: { 'Authorization': `Bearer ${store.state.token}` },
-      });
-      if (!res.ok) {
-        console.error(`failed to fetch Crypko info. status: ${res.status}, body: ${await res.text()}`);
-        continue;
-      }
+    /** @type {CrypkoResponseJSON} */
+    const resJSON = await res.json();
+    const { name, owner, model, faved, parents, children } = resJSON;
 
-      const { parents, children } = await res.json();
+    /** @type {Crypko} */
+    const crypko = {
+      hash,
+      name,
+      ownerID: owner.id,
+      model,
+      faved,
+      parents: parents.map((parent) => parent.hash),
+      children: children.map((child) => child.hash),
+    };
+    crypkos.push(crypko);
 
-      /** @type {Crypko} */
-      const crypko = {
-        hash: hash,
-        name: result.name,
-        ownerID: result.owner.id,
-        model: result.model,
-        public: result.public,
-        faved: result.faved,
-        parents: parents.map((/** @type {any} */ parent) => parent.hash),
-        children: children.map((/** @type {any} */ child) => child.hash),
-      };
-      crypkos.push(crypko);
-
-      // NOTE: workaround for 429 "Request was throttled. Expected available in 1 second."
-      await sleep(1);
-    }
-    url = resJSON.next;
-    if (!url) { break; }
+    // NOTE: workaround for 429 "Request was throttled. Expected available in 1 second."
+    await sleep(.1);
   }
 
   if (crypkos.length !== count) {
