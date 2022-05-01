@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import {
   dagStratify,
   sugiyama,
+  grid,
   layeringSimplex,
   layeringLongestPath,
   layeringCoffmanGraham,
@@ -43,6 +44,7 @@ function render(crypkos) {
   const dag = createDAG(crypkos);
 
   // NOTE: https://observablehq.com/@erikbrinkman/d3-dag-sugiyama
+  // NOTE: https://observablehq.com/@erikbrinkman/d3-dag-topological
 
   // shortest edges
   const layering = layeringSimplex();
@@ -60,9 +62,22 @@ function render(crypkos) {
     .decross(decrossing)
     .nodeSize((/** @type {DagNode<Crypko, undefined>} */ node) => {
       const size = node ? imageSize : 12
-      return [1.2 * size, 1.5 * size];
+      return [1.5 * size, 1.5 * size];
     });
-  const { width, height } = layout(dag);
+  // const layout = grid()
+  //   .nodeSize([1.5 * imageSize, 1.5 * imageSize]);
+
+  const { width: height, height: width } = layout(dag);
+
+  // flip x and y to place the graph vertically
+  for (const node of dag) {
+    [node.x, node.y] = [node.y, node.x];
+  }
+  for (const { points } of dag.ilinks()) {
+    for (const point of points) {
+      [point.x, point.y] = [point.y, point.x];
+    }
+  }
 
   const svg = document.querySelector('svg');
   svg.style.width = `${Math.ceil(width + imageSize)}px`;
