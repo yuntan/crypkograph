@@ -1,5 +1,15 @@
 import * as d3 from 'd3';
-import { dagStratify, sugiyama, decrossOpt, DagNode, DagLink } from 'd3-dag';
+import {
+  dagStratify,
+  sugiyama,
+  layeringSimplex,
+  layeringLongestPath,
+  layeringCoffmanGraham,
+  decrossTwoLayer,
+  twolayerGreedy,
+  twolayerAgg,
+  DagNode,
+} from 'd3-dag';
 
 import './types.mjs'
 
@@ -22,20 +32,33 @@ function render(crypkos) {
     .parentIds((/** @type {Crypko} */ { parents }) => parents);
   const dag = createDAG(crypkos);
 
+  // NOTE: https://observablehq.com/@erikbrinkman/d3-dag-sugiyama
+
+  // shortest edges
+  const layering = layeringSimplex();
+  // minimum height
+  // const layering = layeringLongestPath();
+  // constrained width
+  // const layering = layeringCoffmanGraham();
+
+  // two layer greedy (fast)
+  const decrossing =
+    decrossTwoLayer().order(twolayerGreedy().base(twolayerAgg()));
+
   const layout = sugiyama()
-    // .decross(decrossOpt()) // FIXME: CPU freeze
-    .nodeSize(
-      (/** @type {DagNode<Crypko, undefined>} */ _) =>
-        [imageSize * 2, imageSize * 2]
-    );
+    .layering(layering)
+    .decross(decrossing)
+    .nodeSize((/** @type {DagNode<Crypko, undefined>} */ node) => {
+      const size = node ? imageSize : 12
+      return [1.2 * size, 1.5 * size];
+    });
   const { width, height } = layout(dag);
 
   const svg = document.querySelector('svg');
-  svg.style.width = `${width}px`;
-  svg.style.height = `${height}px`;
+  svg.style.width = `${Math.ceil(width + imageSize)}px`;
+  svg.style.height = `${Math.ceil(height + imageSize)}px`;
 
   const selection = d3.select('svg');
-  selection.attr('viewBox', [0, 0, width, height].join(' '));
 
   const line = d3.line()
     .curve(d3.curveCatmullRom)
@@ -52,8 +75,7 @@ function render(crypkos) {
     .attr('fill', 'none')
     .attr('stroke-width', 3)
     .attr('stroke', 'black')
-    .attr('y', 128)
-    .attr('transform', `translate(${imageSize / 2}, ${imageSize / 2})`)
+    .attr('transform', `translate(${imageSize / 2}, ${imageSize / 2})`);
 
   const nodes = selection
     .append('g')
@@ -61,19 +83,25 @@ function render(crypkos) {
     .data(dag.descendants())
     .enter()
     .append('g')
-    .attr('transform', (/** @type {any} */ { x, y }) => `translate(${x}, ${y})`);
+    .attr(
+      'transform',
+      (/** @type {any} */ { x, y }) => `translate(${x}, ${y})`
+    );
 
+  // add border rect
   nodes
     .append('rect')
     .attr('class', 'svg-image-border')
     .attr('width', imageSize + 2)
-    .attr('height', imageSize + 2)
+    .attr('height', imageSize + 2);
 
+  // add image
   nodes
     .append('image')
     .attr('xlink:href', (d) => crypkoThumbnailURLs[d.data.hash])
     .attr('width', imageSize).attr('height', imageSize)
 
+  // add label background
   nodes
     .append('rect')
     .attr('class', 'svg-text-background')
@@ -81,6 +109,7 @@ function render(crypkos) {
     .attr('height', 12)
     .attr('y', imageSize - 12);
 
+  // add name label
   nodes
     .append('text')
     .text((d) => d.data.name)
