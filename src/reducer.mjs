@@ -19,8 +19,8 @@ export default function reducer(state, op) {
     state.crypkoThumbnailURLs[crypkoID] = url;
     break;
 
-  case 'putCrypkos':
-    state.crypkos = state.crypkos.concat(payload);
+  case 'setCrypkos':
+    state.crypkos = payload;
     break;
 
   default:

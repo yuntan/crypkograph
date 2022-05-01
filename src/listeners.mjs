@@ -62,7 +62,7 @@ export async function onClicked(tab) {
   const userID = m[1];
   const crypkos = await fetchAllCrypkos(userID);
 
-  store.dispatch('putCrypkos', crypkos);
+  store.dispatch('setCrypkos', crypkos);
 
   // let url = `https://api.crypko.ai/crypkos/?ordering=-created&page=1&owner=${userID}`
   // const res = await fetch(url, )
