@@ -11,15 +11,25 @@ import {
   DagNode,
 } from 'd3-dag';
 
+import sleep from './sleep.mjs'
 import './types.mjs'
 
 const imageSize = 96;
 
 /** @type {Crypko[]} */
-const crypkos = await chrome.runtime.sendMessage('getCrypkos');
+let crypkos = [];
+
 /** @type {{ [crypkoHash: string]: string }} */
-const crypkoThumbnailURLs =
-  await chrome.runtime.sendMessage('getCrypkoThumbnailURLs')
+let crypkoThumbnailURLs = {};
+
+while (crypkos.length === 0 || Object.keys(crypkoThumbnailURLs).length === 0) {
+  crypkos = await chrome.runtime.sendMessage('getCrypkos');
+  crypkoThumbnailURLs =
+    await chrome.runtime.sendMessage('getCrypkoThumbnailURLs')
+  await sleep(1);
+}
+
+document.querySelector('#loading-message').remove();
 
 render(crypkos);
 

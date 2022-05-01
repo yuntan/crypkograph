@@ -48,35 +48,40 @@ export function onBeforeRequest(details) {
  * @param {chrome.tabs.Tab} tab
  */
 export async function onClicked(tab) {
-  if (!store.state.token) {
-    console.error('Token is null!');
-    return;
-  }
-
   const m = tab.url.match(/^https:\/\/crypko.ai\/user\/(\d+)\//);
   if (!m) {
     console.log('This is not a Crypko user page.');
     return;
   }
-
   const userID = m[1];
+
+  const url = chrome.runtime.getURL('index.html');
+  const extensionPageTab = await chrome.tabs.create({ url });
+
+  await chrome.tabs.reload(tab.id);
+  await sleep(5);
+  if (!store.state.token) {
+    console.error('Token is null!');
+    return;
+  }
+
   const crypkos = await fetchAllCrypkos(userID);
 
   store.dispatch('setCrypkos', crypkos);
 
-  // let url = `https://api.crypko.ai/crypkos/?ordering=-created&page=1&owner=${userID}`
-  // const res = await fetch(url, )
-
+  const tabIDs = [];
   for (let i = 1; i <= Math.ceil(crypkos.length / 20); i++) {
     const url = `https://crypko.ai/user/${userID}/crypko?page=${i}`
     const tab = await chrome.tabs.create({ url });
-    await sleep(15);
-    await chrome.tabs.remove(tab.id);
+    tabIDs.push(tab.id);
   }
 
-  const baseURL = chrome.runtime.getURL('index.html');
-  const url = `${baseURL}?token=${store.state.token}&userID=${userID}`;
-  await chrome.tabs.create({ url });
+  await chrome.tabs.update(extensionPageTab.id, { active: true });
+  await sleep(30);
+
+  for (const id of tabIDs) {
+    await chrome.tabs.remove(id);
+  }
 }
 
 /**
@@ -115,7 +120,7 @@ async function fetchAllCrypkos(userID) {
       resJSON.results.map((result) => result.hash)
     );
 
-    await sleep(.1);
+    await sleep(.2);
   }
 
   /** @type Crypko[] */
@@ -147,12 +152,17 @@ async function fetchAllCrypkos(userID) {
     crypkos.push(crypko);
 
     // NOTE: workaround for 429 "Request was throttled. Expected available in 1 second."
-    await sleep(.1);
+    await sleep(.2);
   }
 
   if (crypkos.length !== count) {
     console.error(`Crypko count unmatch. crypkos.lenght: ${crypkos.length}, count: ${count}`);
   }
+
+  const parentAndChildHashs = crypkos.flatMap(
+    (crypko) => crypko.parents.concat(crypko.children)
+  );
+  // const missingHashs = 
 
   return crypkos;
 }
