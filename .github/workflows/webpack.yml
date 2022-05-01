@@ -1,7 +1,8 @@
-name: Release with Webpack
+name: Webpack and Release
 
 on:
-  tags: [ v* ]
+  push:
+    tags: [ v* ]
 
 jobs:
   build:
