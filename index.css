@@ -1,29 +1,9 @@
-* {
-  box-sizing: border-box;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 html {
   height: 100%;
-}
-
-.p-4 {
-  padding: 1rem;
-}
-
-.m-0 {
-  margin: 0;
-}
-
-.w-screen {
-  width: 100vw;
-}
-
-.h-screen {
-  height: 100vh;
-}
-
-.overflow-auto {
-  overflow: auto;
 }
 
 .svg-image-border {

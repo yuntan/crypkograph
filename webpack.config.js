@@ -22,7 +22,6 @@ module.exports = {
       patterns: [
         'manifest.json',
         'index.html',
-        'index.css',
         '_locales/**',
         'icons/*.png',
       ],
