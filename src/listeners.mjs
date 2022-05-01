@@ -35,11 +35,11 @@ export function onSendHeaders(details) {
  */
 export function onBeforeRequest(details) {
   const url = details.url;
-  const m = url.match(/^https:\/\/crypko.oss-ap-northeast-1.aliyuncs.com\/users\/\d+\/public\/crypkos\/([a-zA-Z0-9]+)\/display\/MD.jpg/);
+  const m = url.match(/^https:\/\/crypko.oss-ap-northeast-1.aliyuncs.com\/users\/(\d+)\/(public|private)\/crypkos\/([a-zA-Z0-9]+)\/display\/MD.jpg/);
   if (!m) { return; }
 
   console.debug('Found Crypko thumbnail!')
-  const hash = m[1];
+  const hash = m[3];
   store.dispatch('putCrypkoThumbnailURL', [hash, url]);
 }
 
