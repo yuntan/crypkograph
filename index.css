@@ -1,0 +1,38 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  height: 100%;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.m-0 {
+  margin: 0;
+}
+
+.w-screen {
+  width: 100vw;
+}
+
+.h-screen {
+  height: 100vh;
+}
+
+.overflow-auto {
+  overflow: auto;
+}
+
+.svg-image-border {
+  fill: transparent;
+  stroke: black;
+  shape-rendering: crispEdges;
+}
+
+.svg-text-background {
+  fill: white;
+  shape-rendering: crispEdges;
+}

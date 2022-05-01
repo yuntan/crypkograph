@@ -17,8 +17,10 @@ export function onSendHeaders(details) {
 
     const m = header.value.match(/^Bearer (.+)$/);
     token = m[1];
-    store.dispatch('updateToken', token);
-    console.log('Token is here!');
+    if (token !== store.state.token) {
+      store.dispatch('updateToken', token);
+      console.log('Token is here!');
+    }
     break;
   }
 
@@ -36,9 +38,9 @@ export function onBeforeRequest(details) {
   const m = url.match(/^https:\/\/crypko.oss-ap-northeast-1.aliyuncs.com\/users\/\d+\/public\/crypkos\/([a-zA-Z0-9]+)\/display\/MD.jpg/);
   if (!m) { return; }
 
-  console.log('Found Crypko thumbnail!')
-  const crypkoID = m[1];
-  store.dispatch('putCrypkoThumbnailURL', [crypkoID, url]);
+  console.debug('Found Crypko thumbnail!')
+  const hash = m[1];
+  store.dispatch('putCrypkoThumbnailURL', [hash, url]);
 }
 
 /**
@@ -153,4 +155,23 @@ async function fetchAllCrypkos(userID) {
   }
 
   return crypkos;
+}
+
+/**
+ * @param {string} message
+ * @param {chrome.runtime.MessageSender} _
+* @param {(response: any) => void} sendResponse
+ */
+export function onMessage(message, _, sendResponse) {
+  switch (message) {
+    case 'getCrypkos':
+      sendResponse(store.state.crypkos);
+      break;
+
+    case 'getCrypkoThumbnailURLs':
+      sendResponse(store.state.crypkoThumbnailURLs);
+      break;
+
+    default: break;
+  }
 }

@@ -6,6 +6,9 @@ const ZipWebpackPlugin = require('zip-webpack-plugin');
 module.exports = {
   mode: 'development',
   devtool: 'source-map',
+  experiments: {
+    topLevelAwait: true,
+  },
   entry: {
     background: path.resolve(__dirname, 'src/background.js'),
     index: path.resolve(__dirname, 'src/index.js'),
@@ -19,6 +22,7 @@ module.exports = {
       patterns: [
         'manifest.json',
         'index.html',
+        'index.css',
         '_locales/**',
         'icons/*.png',
       ],

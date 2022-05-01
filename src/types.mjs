@@ -11,7 +11,7 @@
  *
  * @typedef {{
  *   token: string?;
- *   crypkoThumbnailURLs: { [crypkoID: string]: string };
+ *   crypkoThumbnailURLs: { [crypkoHash: string]: string };
  *   crypkos: Crypko[];
  * }} State
  *

@@ -2,8 +2,13 @@
   "compilerOptions": {
     "checkJs": true,
     "noImplicitAny": true,
+    "module": "es2022",
     "target": "es2021",
     "lib": ["ES2021", "DOM"],
     "moduleResolution": "node"
-  }
+  },
+  "include": [
+    "src/*.js",
+    "src/*.mjs"
+  ]
 }
