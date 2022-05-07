@@ -12,8 +12,8 @@ import {
   DagNode,
 } from 'd3-dag';
 
+/** @typedef {import('./store.mjs').Crypko} Crypko */
 import sleep from './sleep.mjs'
-import './types.mjs'
 
 const imageSize = 96;
 

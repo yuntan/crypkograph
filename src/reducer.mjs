@@ -1,4 +1,4 @@
-import './types.mjs'
+/** @typedef {import('./store.mjs').State} State
 
 /**
  * @param {State} state

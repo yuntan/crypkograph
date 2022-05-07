@@ -1,4 +1,5 @@
 import Store from './store.mjs'
+/** @typedef {import('./store.mjs').Crypko} Crypko */
 import sleep from './sleep.mjs'
 
 const store = new Store()
@@ -185,3 +186,27 @@ export function onMessage(message, _, sendResponse) {
     default: break;
   }
 }
+
+/**
+ * @typedef {{
+ *   count: number;
+ *   results: CrypkosResponseJSONResult[];
+ * }} CrypkosResponseJSON
+ *
+ * @typedef {{
+ *   hash: string;
+ * }} CrypkosResponseJSONResult
+ *
+ * @typedef {{
+ *   name: string;
+ *   owner: { id: string; };
+ *   model: string;
+ *   faved: boolean;
+ *   parents: CrypkoResponseJSONParentOrChild[];
+ *   children: CrypkoResponseJSONParentOrChild[];
+ * }} CrypkoResponseJSON
+ *
+ * @typedef {{
+ *   hash: string;
+ * }} CrypkoResponseJSONParentOrChild
+ */
