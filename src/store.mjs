@@ -2,6 +2,13 @@ import reducer from './reducer.mjs'
 
 /**
  * @typedef {{
+ *   token: string?;
+ *   crypkoThumbnailURLs: { [crypkoHash: string]: string };
+ *   crypkos: Crypko[];
+*    ready: boolean;
+ * }} State
+ *
+ * @typedef {{
  *   hash: string;
  *   name: string;
  *   ownerID: string;
@@ -10,12 +17,6 @@ import reducer from './reducer.mjs'
  *   parents: string[];
  *   children: string[];
  * }} Crypko
- *
- * @typedef {{
- *   token: string?;
- *   crypkoThumbnailURLs: { [crypkoHash: string]: string };
- *   crypkos: Crypko[];
- * }} State
 */
 
 export default class Store {
@@ -43,5 +44,6 @@ function initialState() {
     token: null,
     crypkoThumbnailURLs: {},
     crypkos: [],
+    ready: false,
   };
 }

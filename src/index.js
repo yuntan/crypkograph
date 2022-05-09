@@ -12,36 +12,33 @@ import {
   DagNode,
 } from 'd3-dag';
 
+/** @typedef {import('./store.mjs').State} State */
 /** @typedef {import('./store.mjs').Crypko} Crypko */
 import sleep from './sleep.mjs'
 
-const imageSize = 96;
+async function main() {
+  /** @type {State} */
+  let state = await chrome.runtime.sendMessage('getState');
+  while (!state.ready) {
+    await sleep(1);
+    state = await chrome.runtime.sendMessage('getState');
+  }
 
-/** @type {Crypko[]} */
-let crypkos = [];
+  document.querySelector('#loading-message').remove();
 
-/** @type {{ [crypkoHash: string]: string }} */
-let crypkoThumbnailURLs = {};
-
-while (crypkos.length === 0 || Object.keys(crypkoThumbnailURLs).length === 0) {
-  crypkos = await chrome.runtime.sendMessage('getCrypkos');
-  crypkoThumbnailURLs =
-    await chrome.runtime.sendMessage('getCrypkoThumbnailURLs')
-  await sleep(1);
+  render(state);
 }
 
-document.querySelector('#loading-message').remove();
-
-render(crypkos);
-
 /**
- * @param {Crypko[]} crypkos
+ * @param {State} state
  */
-function render(crypkos) {
+function render(state) {
+  const imageSize = 96;
+
   const createDAG = dagStratify()
     .id((/** @type {Crypko} */ { hash }) => hash)
     .parentIds((/** @type {Crypko} */ { parents }) => parents);
-  const dag = createDAG(crypkos);
+  const dag = createDAG(state.crypkos);
 
   // NOTE: https://observablehq.com/@erikbrinkman/d3-dag-sugiyama
   // NOTE: https://observablehq.com/@erikbrinkman/d3-dag-topological
@@ -61,7 +58,7 @@ function render(crypkos) {
     .layering(layering)
     .decross(decrossing)
     .nodeSize((/** @type {DagNode<Crypko, undefined>} */ node) => {
-      const size = node ? imageSize : 12
+      const size = node ? imageSize : 12;
       return [1.5 * size, 1.5 * size];
     });
   // const layout = grid()
@@ -123,8 +120,8 @@ function render(crypkos) {
   // add image
   nodes
     .append('image')
-    .attr('xlink:href', (d) => crypkoThumbnailURLs[d.data.hash])
-    .attr('width', imageSize).attr('height', imageSize)
+    .attr('xlink:href', (d) => state.crypkoThumbnailURLs[d.data.hash])
+    .attr('width', imageSize).attr('height', imageSize);
 
   // add label background
   nodes
@@ -141,3 +138,5 @@ function render(crypkos) {
     .attr('alignment-baseline', 'top')
     .attr('y', imageSize);
 }
+
+await main();

@@ -83,6 +83,8 @@ export async function onClicked(tab) {
   for (const id of tabIDs) {
     await chrome.tabs.remove(id);
   }
+
+  store.dispatch('setReady');
 }
 
 /**
@@ -175,12 +177,8 @@ async function fetchAllCrypkos(userID) {
  */
 export function onMessage(message, _, sendResponse) {
   switch (message) {
-    case 'getCrypkos':
-      sendResponse(store.state.crypkos);
-      break;
-
-    case 'getCrypkoThumbnailURLs':
-      sendResponse(store.state.crypkoThumbnailURLs);
+    case 'getState':
+      sendResponse(store.state);
       break;
 
     default: break;

@@ -10,21 +10,25 @@ export default function reducer(state, op) {
   const { action, payload } = op;
 
   switch (action) {
-  case 'updateToken':
-    state.token = payload;
-    break;
+    case 'updateToken':
+      state.token = payload;
+      break;
 
-  case 'putCrypkoThumbnailURL':
-    const [crypkoID, url] = payload;
-    state.crypkoThumbnailURLs[crypkoID] = url;
-    break;
+    case 'putCrypkoThumbnailURL':
+      const [crypkoID, url] = payload;
+      state.crypkoThumbnailURLs[crypkoID] = url;
+      break;
 
-  case 'setCrypkos':
-    state.crypkos = payload;
-    break;
+    case 'setCrypkos':
+      state.crypkos = payload;
+      break;
 
-  default:
-    break;
+    case 'setReady':
+      state.ready = true;
+      break;
+
+    default:
+      break;
   }
 
   console.debug(state);
