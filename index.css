@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  h1 {
+    @apply text-2xl mt-3 ml-6;
+  }
+  
+  p {
+    @apply text-base ml-6;
+  }
+}
+
 html {
   height: 100%;
 }
